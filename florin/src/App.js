@@ -42,18 +42,31 @@ const App = () => {
     }
   }
 
+  const handleLogout = async (event) => {
+    // Deletes logged in User from local storage
+    window.localStorage.removeItem('loggedFlorinappUser')
+    // reload page
+    window.location.reload();
+  }
+
   return (
     <div>
       <h1>Florin Finances App</h1>
       <Notification message={errorMessage} />
-
-      <LoginForm
-        username={username}
-        password={password}
-        handleUsernameChange={({ target }) => setUsername(target.value)}
-        handlePasswordChange={({ target }) => setPassword(target.value)}
-        handleSubmit={handleLogin}
-      />
+      {!user &&
+        <LoginForm
+          username={username}
+          password={password}
+          handleUsernameChange={({ target }) => setUsername(target.value)}
+          handlePasswordChange={({ target }) => setPassword(target.value)}
+          handleSubmit={handleLogin}
+        />
+      }
+      {user &&
+        <div>
+          <p>{user.name} logged in <button onClick={handleLogout}>logout</button></p>
+        </div>
+      }
     </div>
   )
 }
