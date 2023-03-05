@@ -1,5 +1,4 @@
 ('use strict')
-require('dotenv').config()
 const fs = require('fs/promises')
 const express = require('express')
 const bodyParser = require('body-parser')
@@ -10,7 +9,6 @@ const {
     PlaidApi,
 } = require('plaid')
 
-const APP_PORT = process.env.APP_PORT || 8000
 const CURR_USER_ID = process.env.USER_ID || 1
 const USER_FILES_FOLDER = '.data'
 const FIELD_ACCESS_TOKEN = 'accessToken'
@@ -20,10 +18,6 @@ const app = express()
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 app.use(express.static('public'))
-
-const server = app.listen(APP_PORT, function () {
-    console.log(`Server is up and running at http://localhost:${APP_PORT}/`)
-})
 
 // Set up the Plaid client - Initialize the Plaid client library for NodeJS
 const plaidConfig = new Configuration({
@@ -38,8 +32,9 @@ const plaidConfig = new Configuration({
 })
 const plaidClient = new PlaidApi(plaidConfig)
 
+// eslint-disable-next-line no-unused-vars
 app.get('/server/run_tutorial_precheck', async (req, res, next) => {
-    // Let's double-check a few things to make sure our tutorial is 
+    // Let's double-check a few things to make sure our tutorial is
     // running smoothly
     try {
         if (process.env.PLAID_CLIENT_ID === null || process.env.PLAID_CLIENT_ID === '') {
@@ -174,7 +169,7 @@ app.post('/server/swap_public_token', async (req, res, next) => {
         const response = await plaidClient.itemPublicTokenExchange({
             public_token: req.body.public_token,
         })
-        if (response.data !== null && response.data.access_token != null) {
+        if (response.data !== null && response.data.access_token !== null) {
             await updateUserRecord(FIELD_ACCESS_TOKEN, response.data.access_token)
             await updateUserRecord(FIELD_USER_STATUS, 'connected')
         }
@@ -216,6 +211,7 @@ app.get('/server/get_accounts_info', async (req, res, next) => {
 })
 
 
+// eslint-disable-next-line no-unused-vars
 const errorHandler = function (err, req, res, next) {
     console.error('Your error:')
     console.error(err)
