@@ -21,6 +21,8 @@ const errorHandler = (error, request, response, next) => {
         return response.status(401).json({
             error: 'token expired'
         })
+    } else if (error.response?.data !== null) {
+        return response.status(500).send(error.response.data)
     }
     next(error)
 }
