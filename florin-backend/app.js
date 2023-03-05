@@ -6,6 +6,8 @@ const logger = require('./utils/logger')
 const mongoose = require('mongoose')
 require('express-async-errors')
 
+//Plaid Declarations
+
 //const blogsRouter = require('./controllers/blogs')
 const usersRouter = require('./controllers/users')
 const loginRouter = require('./controllers/login')
