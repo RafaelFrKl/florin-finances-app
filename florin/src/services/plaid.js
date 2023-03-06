@@ -1,19 +1,11 @@
 import axios from 'axios'
 import { callMyServer, showOutput } from "./plaidUtils.js";
 
-const checkConnectedStatus = async function () {
-    const connectedData = await callMyServer("/api/plaid/get_user_info");
-    if (connectedData.user_status === "connected") {
-        showOutput(`Plaid is connected to your financial institution`);
-    }   
-};
-
 const exchangeToken = async (publicTokenToExchange, id) => {
     const result = await callMyServer("/api/plaid/swap_public_token", true, {
         public_token: publicTokenToExchange,
     })
     console.log("Done exchanging our token. I'll re-fetch our status");
-    await checkConnectedStatus()
     console.log(result) 
     
     // Save hashed accessToken to User in DB
@@ -54,7 +46,6 @@ const runTutorialPrecheck = async function () {
         showOutput(tutorialStatus.errorMessage);
     } else {
         showOutput("Plaid is Connected");
-        checkConnectedStatus();
     }
 };
 
@@ -64,5 +55,4 @@ export default {
     exchangeToken,
     getAccountsInfo,
     getItemInfo,
-    checkConnectedStatus
 }
