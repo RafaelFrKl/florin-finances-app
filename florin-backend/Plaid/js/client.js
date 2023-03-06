@@ -4,7 +4,7 @@ let linkTokenData;
 let publicTokenToExchange;
 
 export const checkConnectedStatus = async function () {
-    const connectedData = await callMyServer("/server/get_user_info");
+    const connectedData = await callMyServer("/api/plaid/get_user_info");
     if (connectedData.user_status === "connected") {
         document.querySelector("#connectedUI").classList.remove("d-none");
         document.querySelector("#disconnectedUI").classList.add("d-none");
@@ -19,7 +19,7 @@ export const checkConnectedStatus = async function () {
 // linkTokenData
 const initializeLink = async function () {
 
-    linkTokenData = await callMyServer("/server/generate_link_token", true);
+    linkTokenData = await callMyServer("/api/plaid/generate_link_token", true);
     showOutput(`Received link token data ${JSON.stringify(linkTokenData)}`);
     if (linkTokenData != null) {
         document.querySelector("#startLink").removeAttribute("disabled");
@@ -57,7 +57,7 @@ const startLink = function () {
 };
 
 async function exchangeToken() {
-    await callMyServer("/server/swap_public_token", true, {
+    await callMyServer("/api/plaid/swap_public_token", true, {
         public_token: publicTokenToExchange,
     });
     console.log("Done exchanging our token. I'll re-fetch our status");
@@ -67,13 +67,13 @@ async function exchangeToken() {
 
 // TODO: Get information about the account(s) we're connected to
 const getAccountsInfo = async function () {
-    const accountsData = await callMyServer('/server/get_accounts_info');
+    const accountsData = await callMyServer('/api/plaid/get_accounts_info');
     showOutput(JSON.stringify(accountsData));
 };
 
 // Get information about the Item we're connected to
 const getItemInfo = async function () {
-    const itemData = await callMyServer("/server/get_item_info");
+    const itemData = await callMyServer("/api/plaid/get_item_info");
     showOutput(JSON.stringify(itemData));
 };
 
