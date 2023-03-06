@@ -1,12 +1,14 @@
 const plaidrouter = require('express').Router()
 const { PlaidApi } = require('plaid')
+const bcrypt = require('bcrypt')
+const User = require('../models/user')
 const config = require('../utils/config')
-const userRecord = require('../utils/userRecord')
 const plaidClient = new PlaidApi(config.PLAID_CONFIG)
 
-const CURR_USER_ID = process.env.USER_ID || 1
+
 const FIELD_ACCESS_TOKEN = 'accessToken'
 const FIELD_USER_STATUS = 'userStatus'
+const CURR_USER_ID = 'testuser'
 
 // Make sure Plaid is working correctly
 // eslint-disable-next-line no-unused-vars
@@ -36,18 +38,6 @@ plaidrouter.get('/run_precheck', async (req, res, next) => {
 
 })
 
-// Fetches some info about our user from our "database" and returns it to the client
-plaidrouter.get('/get_user_info', async (req, res, next) => {
-    try {
-        res.json({
-            user_status: userRecord[FIELD_USER_STATUS],
-            user_id: CURR_USER_ID,
-        })
-    } catch (error) {
-        next(error)
-    }
-})
-
 // Generates a Link token to be used by the client.\
 plaidrouter.post('/generate_link_token', async (req, res, next) => {
     try {
@@ -74,16 +64,17 @@ plaidrouter.post('/generate_link_token', async (req, res, next) => {
 })
 
 // Swap the public token for an access token, so we can access account info in the future
-plaidrouter.post('/swap_public_token', async (req, res, next) => {
+plaidrouter.post('/swap_public_token', async (request, res, next) => {
     try {
         const response = await plaidClient.itemPublicTokenExchange({
-            public_token: req.body.public_token,
+            public_token: request.body.public_token,
         })
+        console.log(request.body.public_token)
         if (response.data !== null && response.data.access_token !== null) {
-            await userRecord.updateUserRecord(FIELD_ACCESS_TOKEN, response.data.access_token)
-            await userRecord.updateUserRecord(FIELD_USER_STATUS, 'connected')
+            res.json({
+                status: 'success', accessToken: response.data.access_token
+            })
         }
-        res.json({ status: 'success' })
     } catch (error) {
         next(error)
     }
@@ -92,10 +83,8 @@ plaidrouter.post('/swap_public_token', async (req, res, next) => {
 // Just grabs the results for calling item/get. Useful for debugging purposes
 plaidrouter.get('/get_item_info', async (req, res, next) => {
     try {
-        console.log(FIELD_ACCESS_TOKEN)
-        console.log(userRecord)
         const itemResponse = await plaidClient.itemGet({
-            access_token: userRecord[FIELD_ACCESS_TOKEN]
+            //access_token: userRecord[FIELD_ACCESS_TOKEN]
         })
         res.json(itemResponse.data)
     } catch (error) {
@@ -107,7 +96,7 @@ plaidrouter.get('/get_item_info', async (req, res, next) => {
 plaidrouter.get('/get_accounts_info', async (req, res, next) => {
     try {
         const accountResult = await plaidClient.accountsGet({
-            access_token: userRecord[FIELD_ACCESS_TOKEN],
+            //access_token: userRecord[FIELD_ACCESS_TOKEN],
         })
         res.json(accountResult.data)
     } catch (error) {

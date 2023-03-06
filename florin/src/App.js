@@ -4,9 +4,9 @@ import { usePlaidLink } from 'react-plaid-link';
 import Notification from './components/Notification'
 import LoginForm from './components/LoginForm'
 import Button from './components/Button'
-import financeService from './services/finances'
 import loginService from './services/login'
 import plaidService from './services/plaid'
+import userService from './services/users'
 
 const App = () => {
   const [errorMessage, setErrorMessage] = useState(null)
@@ -24,7 +24,7 @@ const App = () => {
     if (loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON)
       setUser(user)
-      financeService.setToken(user.token)
+      userService.setToken(user.token)
     }
   }, [])
 
@@ -35,7 +35,7 @@ const App = () => {
         username, password,
       })
       console.log(user)
-      financeService.setToken(user.token)
+      userService.setToken(user.token)
       window.localStorage.setItem(
         'loggedFlorinappUser', JSON.stringify(user)
       )
@@ -100,6 +100,20 @@ const App = () => {
     await plaidService.checkConnectedStatus();
   }
 
+  //Test - Gets User from DB
+  const handleUserRecord = id => {
+    userService
+      .getUserRecord(id).then(returnedUser => {
+        setUser(returnedUser)
+      })
+      .catch(() => {
+        setErrorMessage(
+          `User Does not Exist `
+        )
+      })
+    console.log(user)
+  }
+
   return (
     <div>
       <h1>Florin Finances App</h1>
@@ -122,6 +136,7 @@ const App = () => {
           <Button handleClick={open} text="Step 2: Connect a bank account" />
           <Button handleClick={handleExchangeToken} text="Step 3: Exchange a public token" />
           <p>Basic "get my account status" functions</p>
+          <Button handleClick={() => handleUserRecord(user.id)} text="Get User Record" />
           <Button handleClick={plaidService.getAccountsInfo} text="Get into about my Item" />
           <Button handleClick={plaidService.getItemInfo} text="Get info about my account(s)" />
           <div>

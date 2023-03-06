@@ -1,5 +1,4 @@
 import { callMyServer, showOutput } from "./plaidUtils.js";
-let publicTokenToExchange;
 
 const checkConnectedStatus = async function () {
     const connectedData = await callMyServer("/api/plaid/get_user_info");
@@ -7,14 +6,6 @@ const checkConnectedStatus = async function () {
         showOutput(`Plaid is connected to your financial institution`);
     }   
 };
-
-async function exchangeToken() {
-    await callMyServer("/api/plaid/swap_public_token", true, {
-        public_token: publicTokenToExchange,
-    });
-    console.log("Done exchanging our token. I'll re-fetch our status");
-    await checkConnectedStatus();
-}
 
 // TODO: Get information about the account(s) we're connected to
 const getAccountsInfo = async function () {
@@ -41,7 +32,6 @@ const runTutorialPrecheck = async function () {
 runTutorialPrecheck();
 // eslint-disable-next-line import/no-anonymous-default-export
 export default { 
-    exchangeToken,
     getAccountsInfo,
     getItemInfo,
     checkConnectedStatus
