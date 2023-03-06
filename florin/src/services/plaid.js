@@ -26,6 +26,7 @@ const getAccountsInfo = async (accessToken) => {
     }
     console.log(body)
     const accountsData = await axios.post('/api/plaid/get_accounts_info', body)
+    console.log(accountsData.data)
     showOutput(JSON.stringify(accountsData))
 };
 
@@ -37,6 +38,7 @@ const getItemInfo = async (accessToken) => {
     }
     console.log(body)
     const itemData = await axios.post('api/plaid/get_item_info', body)
+    console.log(itemData.data)
     showOutput(JSON.stringify(itemData))
 };
 
