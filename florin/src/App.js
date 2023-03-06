@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { callMyServer, showOutput } from "./services/plaidUtils.js";
 import { usePlaidLink } from 'react-plaid-link';
 import Notification from './components/Notification'
 import LoginForm from './components/LoginForm'
@@ -49,7 +50,7 @@ const App = () => {
     }
   }
 
-  const handleLogout = async (event) => {
+  const handleLogout = (event) => {
     // Deletes logged in User from local storage
     window.localStorage.removeItem('loggedFlorinappUser')
     // reload page
@@ -58,39 +59,45 @@ const App = () => {
 
   // Initialize link by fetching a link token and storing it as our linkTokenData
   const handleInitializeLink = async (event) => {
-    setLinkTokenData(await plaidService.callMyServer("/api/plaid/generate_link_token", true))
-    plaidService.showOutput(`Received link token data ${JSON.stringify(linkTokenData)}`);
+    setLinkTokenData(await callMyServer("/api/plaid/generate_link_token", true))
+    showOutput(`Received link token data ${JSON.stringify(linkTokenData)}`);
     if (linkTokenData === undefined) {
       return;
     }
-    console.log(linkTokenData.link_token)
+    console.log("linkToken:", linkTokenData.link_token)
   }
  
   // Start link using the link token data we have stored
   const { open } = usePlaidLink( {
     token: linkTokenData.link_token,
-    onSuccess: (public_token, metadata) => {
+    onSuccess: (publicToken, metadata) => {
       console.log(`ONSUCCESS: Metadata ${JSON.stringify(metadata)}`);
-      plaidService.showOutput(
+      showOutput(
         `I have a public token: ${publicToken} I should exchange this`
       );
       setPublicTokenToExchange(publicToken)
     },
-    nExit: (err, metadata) => {
+    onExit: (err, metadata) => {
       console.log(
         `Exited early. Error: ${JSON.stringify(err)} Metadata: ${JSON.stringify(
           metadata
         )}`
       );
-      plaidService.showOutput(`Link existed early with status ${metadata.status}`)
+      showOutput(`Link existed early with status ${metadata.status}`)
     },
     onEvent: (eventName, metadata) => {
       console.log(`Event ${eventName}, Metadata: ${JSON.stringify(metadata)}`);
     },
   });
 
-  const handleExchangeToken = async (event) => {
-    plaidService.exchangeToken()
+  async function handleExchangeToken() {
+    console.log("publicToken: ", publicToken)
+    console.log("publicTokenToExchange: ", publicTokenToExchange)
+    await callMyServer("/api/plaid/swap_public_token", true, {
+      public_token: publicTokenToExchange,
+    });
+    console.log("Done exchanging our token. I'll re-fetch our status");
+    await plaidService.checkConnectedStatus();
   }
 
   return (
@@ -115,8 +122,8 @@ const App = () => {
           <Button handleClick={open} text="Step 2: Connect a bank account" />
           <Button handleClick={handleExchangeToken} text="Step 3: Exchange a public token" />
           <p>Basic "get my account status" functions</p>
-          <Button handleClick={handleInitializeLink} text="Get into about my Item" />
-          <Button handleClick={handleInitializeLink} text="Get info about my account(s)" />
+          <Button handleClick={plaidService.getAccountsInfo} text="Get into about my Item" />
+          <Button handleClick={plaidService.getItemInfo} text="Get info about my account(s)" />
           <div>
             Results will go here
           </div>

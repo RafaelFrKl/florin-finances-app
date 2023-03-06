@@ -92,6 +92,8 @@ plaidrouter.post('/swap_public_token', async (req, res, next) => {
 // Just grabs the results for calling item/get. Useful for debugging purposes
 plaidrouter.get('/get_item_info', async (req, res, next) => {
     try {
+        console.log(FIELD_ACCESS_TOKEN)
+        console.log(userRecord)
         const itemResponse = await plaidClient.itemGet({
             access_token: userRecord[FIELD_ACCESS_TOKEN]
         })
