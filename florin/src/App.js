@@ -17,6 +17,7 @@ const App = () => {
 
   const [linkTokenData, setLinkTokenData] = useState('')
   const [publicTokenToExchange, setPublicTokenToExchange] = useState('')
+  const [accessToken, setAccessToken] = useState('')
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('loggedFlorinappUser')
@@ -91,9 +92,19 @@ const App = () => {
     },
   });
 
-  const handleExchangeToken = () => {
-    plaidService.exchangeToken(publicTokenToExchange, user.id)
+  const handleExchangeToken = async () => {
+    const access_Token = await plaidService.exchangeToken(publicTokenToExchange, user.id)
+    setAccessToken(access_Token)
   }
+
+  const handleGetAccountsInfo = () => {
+    plaidService.getAccountsInfo(accessToken)
+  }
+
+  const handleGetItemInfo = () => {
+    plaidService.getItemInfo(accessToken)
+  }
+
 
   //Test - Gets User from DB
   const handleUserRecord = id => {
@@ -132,8 +143,8 @@ const App = () => {
           <Button handleClick={handleExchangeToken} text="Step 3: Exchange a public token" />
           <p>Basic "get my account status" functions</p>
           <Button handleClick={() => handleUserRecord(user.id)} text="Get User Record" />
-          <Button handleClick={plaidService.getAccountsInfo} text="Get into about my Item" />
-          <Button handleClick={plaidService.getItemInfo} text="Get info about my account(s)" />
+          <Button handleClick={handleGetAccountsInfo} text="Get info about my account(s)" />
+          <Button handleClick={handleGetItemInfo} text="Get into about my Item" />
           <div>
             Results will go here
           </div>

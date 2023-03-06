@@ -23,19 +23,29 @@ const exchangeToken = async (publicTokenToExchange, id) => {
     }
     const request = await axios.patch(`api/users/${id}`, body)
     console.log(request) 
-    return request
+    return result.accessToken
 }
 
 // Get information about the account(s) we're connected to
-const getAccountsInfo = async () => {
-    const accountsData = await callMyServer('/api/plaid/get_accounts_info');
-    showOutput(JSON.stringify(accountsData));
+const getAccountsInfo = async (accessToken) => {
+    console.log(accessToken)
+    const body = {
+        accessToken: accessToken
+    }
+    console.log(body)
+    const accountsData = await axios.post('/api/plaid/get_accounts_info', body)
+    showOutput(JSON.stringify(accountsData))
 };
 
 // Get information about the Item we're connected to
-const getItemInfo = async () => {
-    const itemData = await callMyServer("/api/plaid/get_item_info");
-    showOutput(JSON.stringify(itemData));
+const getItemInfo = async (accessToken) => {
+    console.log(accessToken)
+    const body = {
+        accessToken: accessToken
+    }
+    console.log(body)
+    const itemData = await axios.post('api/plaid/get_item_info', body)
+    showOutput(JSON.stringify(itemData))
 };
 
 const runTutorialPrecheck = async function () {

@@ -3,8 +3,6 @@ const { PlaidApi } = require('plaid')
 const config = require('../utils/config')
 const plaidClient = new PlaidApi(config.PLAID_CONFIG)
 
-const ACCESS_TOKEN = 'access-sandbox-ed67581c-a219-46bd-9cb8-d509e27e3f46'
-
 // Make sure Plaid is working correctly
 // eslint-disable-next-line no-unused-vars
 plaidrouter.get('/run_precheck', async (req, res, next) => {
@@ -77,10 +75,11 @@ plaidrouter.post('/swap_public_token', async (request, res, next) => {
 })
 
 // Just grabs the results for calling item/get. Useful for debugging purposes
-plaidrouter.get('/get_item_info', async (req, res, next) => {
+plaidrouter.post('/get_item_info', async (request, res, next) => {
+    console.log('AT: ', request.body)
     try {
         const itemResponse = await plaidClient.itemGet({
-            access_token: ACCESS_TOKEN,
+            access_token: request.body.accessToken,
         })
         res.json(itemResponse.data)
     } catch (error) {
@@ -89,10 +88,11 @@ plaidrouter.get('/get_item_info', async (req, res, next) => {
 })
 
 // Just grabs the results for calling accounts/get. Useful for debugging purposes
-plaidrouter.get('/get_accounts_info', async (req, res, next) => {
+plaidrouter.post('/get_accounts_info', async (request, res, next) => {
+    console.log('AT: ', request.body)
     try {
         const accountResult = await plaidClient.accountsGet({
-            access_token: ACCESS_TOKEN,
+            access_token: request.body.accessToken,
         })
         res.json(accountResult.data)
     } catch (error) {
