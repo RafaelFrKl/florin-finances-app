@@ -16,7 +16,6 @@ const App = () => {
   const [user, setUser] = useState(null)
 
   const [linkTokenData, setLinkTokenData] = useState('')
-  const [publicToken, setPublicToken] = useState('')
   const [publicTokenToExchange, setPublicTokenToExchange] = useState('')
 
   useEffect(() => {
@@ -59,7 +58,9 @@ const App = () => {
 
   // Initialize link by fetching a link token and storing it as our linkTokenData
   const handleInitializeLink = async (event) => {
-    setLinkTokenData(await callMyServer("/api/plaid/generate_link_token", true))
+    setLinkTokenData(await callMyServer("/api/plaid/generate_link_token", true, {
+      username: user.username,
+    }))
     showOutput(`Received link token data ${JSON.stringify(linkTokenData)}`);
     if (linkTokenData === undefined) {
       return;
@@ -90,14 +91,8 @@ const App = () => {
     },
   });
 
-  async function handleExchangeToken() {
-    console.log("publicToken: ", publicToken)
-    console.log("publicTokenToExchange: ", publicTokenToExchange)
-    await callMyServer("/api/plaid/swap_public_token", true, {
-      public_token: publicTokenToExchange,
-    });
-    console.log("Done exchanging our token. I'll re-fetch our status");
-    await plaidService.checkConnectedStatus();
+  const handleExchangeToken = () => {
+    plaidService.exchangeToken(publicTokenToExchange, user.id)
   }
 
   //Test - Gets User from DB

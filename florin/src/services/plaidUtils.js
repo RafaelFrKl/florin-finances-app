@@ -11,7 +11,7 @@ const callMyServer = async function (
     const response = await fetch(endpoint, optionsObj);
     if (response.status === 500) {
         await handleServerError(response);
-        return;
+        return
     }
     const data = await response.json();
     console.log(`Result from calling ${endpoint}: ${JSON.stringify(data)}`);
@@ -31,7 +31,6 @@ const handleServerError = async function (responseObject) {
     }
 };
 
-// eslint-disable-next-line import/no-anonymous-default-export
 export {
     callMyServer,
     showOutput

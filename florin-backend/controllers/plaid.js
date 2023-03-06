@@ -1,14 +1,9 @@
 const plaidrouter = require('express').Router()
 const { PlaidApi } = require('plaid')
-const bcrypt = require('bcrypt')
-const User = require('../models/user')
 const config = require('../utils/config')
 const plaidClient = new PlaidApi(config.PLAID_CONFIG)
 
-
-const FIELD_ACCESS_TOKEN = 'accessToken'
-const FIELD_USER_STATUS = 'userStatus'
-const CURR_USER_ID = 'testuser'
+const ACCESS_TOKEN = 'access-sandbox-ed67581c-a219-46bd-9cb8-d509e27e3f46'
 
 // Make sure Plaid is working correctly
 // eslint-disable-next-line no-unused-vars
@@ -40,9 +35,10 @@ plaidrouter.get('/run_precheck', async (req, res, next) => {
 
 // Generates a Link token to be used by the client.\
 plaidrouter.post('/generate_link_token', async (req, res, next) => {
+    const { username } = req.body
     try {
         const linkTokenConfig = {
-            user: { client_user_id: CURR_USER_ID },
+            user: { client_user_id: username },
             client_name: 'Plaid Tutorial',
             language: 'en',
             products: ['auth'],
@@ -84,7 +80,7 @@ plaidrouter.post('/swap_public_token', async (request, res, next) => {
 plaidrouter.get('/get_item_info', async (req, res, next) => {
     try {
         const itemResponse = await plaidClient.itemGet({
-            //access_token: userRecord[FIELD_ACCESS_TOKEN]
+            access_token: ACCESS_TOKEN,
         })
         res.json(itemResponse.data)
     } catch (error) {
@@ -96,7 +92,7 @@ plaidrouter.get('/get_item_info', async (req, res, next) => {
 plaidrouter.get('/get_accounts_info', async (req, res, next) => {
     try {
         const accountResult = await plaidClient.accountsGet({
-            //access_token: userRecord[FIELD_ACCESS_TOKEN],
+            access_token: ACCESS_TOKEN,
         })
         res.json(accountResult.data)
     } catch (error) {

@@ -47,6 +47,8 @@ router.get('/:id', async (request, response) => {
 // Add AccessToken to User
 router.patch('/:id', async (request, response) => {
     const { accessToken } = request.body
+    console.log('accessToken:', request.body)
+    console.log('accessToken:', accessToken)
 
     const saltRounds = 10
     const accessTokenHash = await bcrypt.hash(accessToken, saltRounds)
