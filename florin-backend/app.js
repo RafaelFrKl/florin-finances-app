@@ -34,6 +34,9 @@ app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 app.use(express.static('public'))
 
+//Uses Frontend Build - For deployment
+app.use(express.static('build'))
+
 app.use(cors())
 app.use(express.json())
 
