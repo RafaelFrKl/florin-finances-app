@@ -124,6 +124,10 @@ const App = () => {
     <div>
       <h1>Florin Finances App</h1>
       <Notification message={errorMessage} />
+
+      <p>User: testuser</p>
+      <p>Password: testpassword</p>
+
       {!user &&
         <LoginForm
           username={username}
